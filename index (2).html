@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0c0e">
+<title>HollGeniX // VSS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b0c0e;--panel:#121418;--panel2:#181b20;--line:#252932;--line2:#343a45;
+  --text:#e9e7e2;--muted:#8a909b;--gold:#d6a449;--gold2:#f0c46a;--goldbg:#17130a;--red:#d9604f;--ok:#6fbf8b;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:radial-gradient(1200px 500px at 50% -200px,#1a1d24 0,transparent 70%),var(--bg);color:var(--text);font:400 16px/1.55 var(--sans);min-height:100vh;padding-bottom:env(safe-area-inset-bottom)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+header{position:sticky;top:0;z-index:20;background:rgba(11,12,14,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.bar{max-width:1120px;margin:0 auto;padding:14px 18px;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.logo{font-weight:600;font-size:20px;letter-spacing:.01em}
+.logo i{font-style:normal;color:var(--gold);font-family:var(--mono);font-weight:500;margin-left:6px}
+.sub{font:400 12px var(--mono);color:var(--muted);margin-top:2px}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:9px 14px;cursor:pointer;transition:border-color .2s,background .2s,color .2s;min-height:40px}
+.btn:hover{border-color:var(--gold);color:var(--gold2)}
+.btn.gold{background:var(--gold);color:#16110a;border-color:var(--gold);font-weight:600}
+.btn.gold:hover{background:var(--gold2);color:#16110a}
+.btn.danger:hover{border-color:var(--red);color:var(--red)}
+.btn[disabled]{opacity:.5;pointer-events:none}
+main{max-width:1120px;margin:0 auto;padding:22px 18px 70px}
+.feed{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;align-items:start}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:14px;transition:border-color .25s,transform .25s,box-shadow .25s}
+.card.ad{background:linear-gradient(180deg,var(--goldbg),var(--panel) 60%);border-color:#5a4521;box-shadow:inset 3px 0 0 var(--gold)}
+@media(hover:hover){.card:hover{transform:translateY(-3px);border-color:var(--line2);box-shadow:0 14px 34px rgba(0,0,0,.45)}.card.ad:hover{border-color:var(--gold);box-shadow:0 14px 34px rgba(214,164,73,.12)}}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.badge{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line2);color:var(--muted);border-radius:4px;padding:3px 8px}
+.ad .badge{border-color:var(--gold);color:var(--gold2)}
+.date{font:400 12px var(--mono);color:var(--muted)}
+.card h2{font-size:19px;line-height:1.3;font-weight:600;letter-spacing:-.005em;text-wrap:balance}
+.ph{border-radius:8px;overflow:hidden;background:#000;border:1px solid var(--line);aspect-ratio:4/3}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+@media(hover:hover){.card:hover .ph img{transform:scale(1.03)}}
+.ex{color:#aeb3bc;font-size:15px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:60px 0}
+/* admin */
+#admin{display:none;border-bottom:1px solid var(--line);background:var(--panel)}
+body.is-admin #admin{display:block}
+.adm{max-width:1120px;margin:0 auto;padding:14px 18px;display:grid;gap:10px}
+.adm summary{cursor:pointer;font:500 13px var(--mono);color:var(--gold2)}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.row input{flex:1 1 220px}
+.note{font-size:13px;color:var(--muted);margin-top:8px}
+input,select,textarea{width:100%;background:#0e1013;border:1px solid var(--line2);border-radius:8px;padding:10px 12px;font-size:16px}
+textarea{min-height:150px;resize:vertical}
+label{display:grid;gap:6px;font-size:13px;color:var(--muted)}
+.admin-only{display:none}
+body.is-admin .admin-only{display:flex}
+/* dialogs */
+dialog{border:1px solid var(--line2);border-radius:14px;background:var(--panel);color:var(--text);padding:0;width:min(680px,calc(100% - 24px));max-height:calc(100dvh - 24px);overflow:auto;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+dialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(3px)}
+dialog[open]{animation:pop .22s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+.dlg{padding:22px;display:grid;gap:14px}
+.dlg.ad{box-shadow:inset 0 3px 0 var(--gold)}
+.dlg h2{font-size:23px;line-height:1.25}
+.dlg .ph{aspect-ratio:auto;max-height:60vh}
+.dlg .ph img{object-fit:contain;max-height:60vh}
+.full{white-space:pre-line;color:#cfd2d8;line-height:1.65}
+.dhead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.x{width:40px;padding:0}
+form.dlg{gap:12px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#0e1013;border:1px solid var(--line2);border-radius:10px;padding:11px 16px;font-size:14px;z-index:99;max-width:calc(100% - 24px);opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.on{opacity:1}#toast.err{border-color:var(--red)}#toast.ok{border-color:var(--ok)}
+footer{text-align:center;color:var(--muted);font:400 12px var(--mono);padding:10px 18px 40px}
+@media(max-width:560px){.bar{padding:12px 14px}.logo{font-size:18px}main{padding:16px 12px 60px}.feed{grid-template-columns:1fr;gap:14px}.card{padding:15px}.card h2{font-size:18px}.dlg{padding:16px}.dlg h2{font-size:20px}.acts .btn{flex:1}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div><div class="logo">HollGeniX<i>// VSS</i></div><div class="sub">закрытый информационный портал</div></div>
+    <button class="btn" id="loginBtn" type="button">Вход</button>
+  </div>
+</header>
+
+<section id="admin" aria-label="Панель администратора">
+  <div class="adm">
+    <details id="tokBox">
+      <summary>GitHub-токен для публикации</summary>
+      <div class="row">
+        <input id="tok" type="password" autocomplete="off" placeholder="github_pat_… (хранится только в этом браузере)">
+        <button class="btn" id="tokSave" type="button">Сохранить</button>
+        <button class="btn" id="tokCheck" type="button">Проверить</button>
+        <button class="btn danger" id="tokDel" type="button">Удалить</button>
+      </div>
+      <p class="note">Создайте fine-grained токен только для репозитория HollGeniX-news с правом Contents: Read and write. Он остаётся в localStorage этого устройства и в код не попадает.</p>
+    </details>
+    <div class="row" style="margin:0">
+      <button class="btn gold" id="newBtn" type="button">+ Новый пост</button>
+      <button class="btn" id="syncBtn" type="button">Обновить из GitHub</button>
+      <button class="btn danger" id="logoutBtn" type="button">Выйти</button>
+    </div>
+  </div>
+</section>
+
+<main><div class="feed" id="feed" aria-live="polite"></div></main>
+<footer>HollGeniX // VSS</footer>
+
+<dialog id="readDlg"></dialog>
+
+<dialog id="loginDlg">
+  <form class="dlg" id="loginForm" method="dialog">
+    <h2>Вход для администратора</h2>
+    <input id="pass" type="password" autocomplete="current-password" placeholder="Пароль" required>
+    <div class="acts"><button class="btn gold" type="submit">Войти</button><button class="btn" type="button" data-close>Отмена</button></div>
+  </form>
+</dialog>
+
+<dialog id="editDlg">
+  <form class="dlg" id="editForm" method="dialog">
+    <h2 id="editTitle">Новый пост</h2>
+    <label>Тип<select id="fType"><option value="news">Новость</option><option value="ad">Реклама</option></select></label>
+    <label>Заголовок<input id="fTitle" required maxlength="200"></label>
+    <label>Текст<textarea id="fText" required></textarea></label>
+    <label>Дата<input id="fDate" placeholder="дд.мм.гггг"></label>
+    <label>Фото с устройства<input id="fFile" type="file" accept="image/*"></label>
+    <label>…или имя файла / ссылка<input id="fImg" placeholder="IMG_….jpg или https://…"></label>
+    <div class="acts"><button class="btn gold" id="fSave" type="submit">Опубликовать</button><button class="btn" type="button" data-close>Отмена</button></div>
+  </form>
+</dialog>
+
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== Настройки ===== */
+const OWNER='hoquay', REPO='HollGeniX-news', BRANCH='main';
+const ADMIN_PASS_HASH='240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9'; // SHA-256 вашего прежнего пароля
+const TOKEN_KEY='vss_gh_token';
+const API=`https://api.github.com/repos/${OWNER}/${REPO}/contents/`;
+
+/* ===== Стартовые посты (показываются, пока нет posts.json) ===== */
+const DEFAULT_POSTS=[
+{"id": "d1", "type": "news", "date": "24.11.2026", "title": "Турист из Монголии в шоке от того, что люди в России едят курицу", "img": "IMG_20261125_212448_884.jpg", "text": "По словам гостя, он готовился увидеть степные традиции, но столкнулся с целыми витринами жареной птицы. Местные жители объяснили ему, что курица здесь — главный стратегический ресурс после обеда."},
+{"id": "d2", "type": "news", "date": "24.11.2026", "title": "Осужден самый прослушиваемый DJ в селе за употребление наркотиков", "img": "IMG_20261125_212508_104.jpg", "text": "Редакция выяснила подробности громкого дела: музыкант слишком громко включал басы по ночам, из-за чего соседи заподозрили запрещённые вещества. Экспертиза нашла в плеере только треки десятилетней давности."},
+{"id": "d3", "type": "ad", "date": "24.11.2026", "title": "90001919101010 рублей сразу, 1 рубль после смерти — будь с нами", "img": "IMG_20261125_212508_966.jpg", "text": "Специальное предложение от структуры VSS: мгновенное начисление на внутренний баланс и символическая выплата в вечности. Условия действуют при соблюдении протокола молчания."},
+{"id": "d4", "type": "news", "date": "24.11.2026", "title": "Французский наёмник посетил Уссурийск и рассказал что...", "img": "IMG_20261125_212510_413.jpg", "text": "После прогулки у въездного знака путешественник заявил, что местные дороги проверяют характер лучше любых горных перевалов. Подробный отчёт обещали опубликовать после сушки обуви."},
+{"id": "d5", "type": "news", "date": "24.11.2026", "title": "Россия нашла причину массовых засоров туалетов по всей стране!", "img": "IMG_20261125_212512_129.jpg", "text": "Комиссия проверила городские люки и выяснила, что часть проблем возникает из-за слишком драматичных попыток решить бытовые вопросы. Администрация пообещала держать ситуацию на контроле."},
+{"id": "d6", "type": "news", "date": "24.11.2026", "title": "Дагестан провёл совместные учения с Монголией, подводим итоги вместе", "img": "IMG_20261125_212513_163.jpg", "text": "Участники отработали координацию на местности, обмен опытом и дружеские рукопожатия в кадре. Итоговый протокол сошёлся на том, что хороший чай важнее любого брифинга."},
+{"id": "d7", "type": "news", "date": "24.11.2026", "title": "Инновации в Азербайджане!!! Шок!! Учёный изобрёл телефон !!", "img": "IMG_20261125_212514_017.jpg", "text": "По утверждению авторов сообщения, устройство позволяет держать связь на расстоянии и смотреть в чёрный экран с умным видом. Технологическое сообщество обсуждает новинку вторые сутки."},
+{"id": "d8", "type": "news", "date": "24.11.2026", "title": "Французский легион на отдыхе во Владивостоке, во время войны 1984 год", "img": "IMG_20261125_212515_600.jpg", "text": "Архивная хроника из параллельного календаря показывает привал среди весенней травы и цветущих кустов. Историки отмечают, что в тот год погода была особенно переменчивой."},
+{"id": "d9", "type": "news", "date": "24.11.2026", "title": "Огромного бобра нашли в лесу России! Местные власти подключили военных", "img": "IMG_20261125_212516_976.jpg", "text": "Животное заметили рядом с повреждённым стволом дерева в лесной зоне. Специалисты уточняют, был ли это строительный проект или плановая лесозаготовка."},
+{"id": "d10", "type": "news", "date": "24.11.2026", "title": "В сеть слили клип к новому треку MEDOKK — смотри скорее пока не удалили", "img": "IMG_20261125_212517_802.jpg", "text": "Кадры с необычным визуальным эффектом и пометкой об ограничении возраста быстро разлетелись по чатам. Поклонники спорят, выйдет ли расширенная версия."}
+];
+
+/* ===== Состояние ===== */
+let posts=DEFAULT_POSTS.slice(), editingId=null, busy=false;
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const isAdmin=()=>sessionStorage.getItem('vss_admin')==='1';
+const getTok=()=>{try{return localStorage.getItem(TOKEN_KEY)||''}catch(e){return ''}};
+const imgSrc=p=>!p?'':/^(https?:|data:)/.test(p)?p:'./'+encodeURI(p);
+
+function toast(msg,kind){const t=$('#toast');t.textContent=msg;t.className='on '+(kind||'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',3600)}
+
+/* ===== Рендер ===== */
+function card(p){
+  const ad=p.type==='ad';
+  return `<article class="card${ad?' ad':''}" data-id="${esc(p.id)}">
+    <div class="meta"><span class="badge">${ad?'Реклама':'Новость'}</span><span class="date">${esc(p.date)}</span></div>
+    <h2>${esc(p.title)}</h2>
+    ${p.img?`<div class="ph"><img src="${esc(imgSrc(p.img))}" alt="" loading="lazy" onerror="this.parentNode.style.display='none'"></div>`:''}
+    <p class="ex">${esc(p.text)}</p>
+    <div class="acts"><button class="btn" data-act="read">Подробнее</button>
+    <span class="admin-only" style="gap:8px;flex-wrap:wrap"><button class="btn" data-act="edit">Изменить</button><button class="btn danger" data-act="del">Удалить</button></span></div>
+  </article>`;
+}
+function render(){$('#feed').innerHTML=posts.length?posts.map(card).join(''):'<div class="empty">Публикаций пока нет.</div>'}
+
+function openRead(id){
+  const p=posts.find(x=>x.id===id);if(!p)return;const ad=p.type==='ad';
+  const d=$('#readDlg');
+  d.innerHTML=`<div class="dlg${ad?' ad':''}">
+    <div class="dhead"><span class="badge" ${ad?'style="border-color:var(--gold);color:var(--gold2)"':''}>${ad?'Реклама':'Новость'}</span><span class="date">${esc(p.date)}</span><button class="btn x" data-close aria-label="Закрыть">✕</button></div>
+    <h2>${esc(p.title)}</h2>
+    ${p.img?`<div class="ph"><img src="${esc(imgSrc(p.img))}" alt="" onerror="this.parentNode.style.display='none'"></div>`:''}
+    <div class="full">${esc(p.text)}</div></div>`;
+  d.showModal();
+}
+
+/* ===== Загрузка ленты (всем посетителям) ===== */
+async function loadPosts(){
+  try{
+    const r=await fetch('posts.json?t='+Date.now(),{cache:'no-store'});
+    if(r.ok){const j=await r.json();if(Array.isArray(j)){posts=j}}
+  }catch(e){/* posts.json нет — остаются стартовые посты */}
+  render();
+}
+
+/* ===== GitHub API ===== */
+async function gh(path,opt={}){
+  const tok=getTok();if(!tok)throw new Error('Сначала сохраните GitHub-токен');
+  const r=await fetch(API+path,{...opt,headers:{'Authorization':'Bearer '+tok,'Accept':'application/vnd.github+json','Content-Type':'application/json'}});
+  return r;
+}
+const b64utf8=s=>btoa(unescape(encodeURIComponent(s)));
+const unb64utf8=s=>decodeURIComponent(escape(atob(s.replace(/\s/g,''))));
+async function errMsg(r){let m='';try{m=(await r.json()).message}catch(e){}
+  if(r.status===401)return 'Токен недействителен (401)';
+  if(r.status===403||r.status===404)return 'Нет доступа: проверьте права токена Contents: Read and write ('+r.status+')';
+  return 'GitHub: '+(m||r.status)}
+async function getFile(path){
+  const r=await gh(path+'?ref='+BRANCH+'&t='+Date.now());
+  if(r.status===404){const probe=await gh('').catch(()=>null);if(probe&&probe.status===404)throw new Error(await errMsg(probe));return null}
+  if(!r.ok)throw new Error(await errMsg(r));
+  return r.json();
+}
+async function putFile(path,contentB64,message){
+  const cur=await getFile(path);
+  const body={message,content:contentB64,branch:BRANCH};if(cur&&cur.sha)body.sha=cur.sha;
+  const r=await gh(path,{method:'PUT',body:JSON.stringify(body)});
+  if(!r.ok)throw new Error(await errMsg(r));
+}
+async function remotePosts(){
+  const f=await getFile('posts.json');
+  if(!f)return null;
+  const j=JSON.parse(unb64utf8(f.content));return Array.isArray(j)?j:null;
+}
+async function commit(mutator,message,afterRead){
+  if(busy)return;busy=true;document.querySelectorAll('.btn').forEach(b=>b.disabled=true);
+  try{
+    const base=(await remotePosts())||posts.slice();
+    const next=mutator(base);
+    await putFile('posts.json',b64utf8(JSON.stringify(next,null,2)),message);
+    posts=next;render();toast('Опубликовано. Сайт обновится у всех через ~1 минуту','ok');
+    return true;
+  }catch(e){toast(e.message||'Ошибка сохранения','err');return false}
+  finally{busy=false;document.querySelectorAll('.btn').forEach(b=>b.disabled=false)}
+}
+
+/* ===== Сжатие и загрузка фото ===== */
+function compress(file,max=1280,q=.82){
+  return new Promise((res,rej)=>{
+    const u=URL.createObjectURL(file),im=new Image();
+    im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));
+      const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);
+      res(c.toDataURL('image/jpeg',q).split(',')[1])};
+    im.onerror=()=>rej(new Error('Не удалось прочитать фото'));im.src=u;
+  });
+}
+
+/* ===== Админка ===== */
+function setAdmin(on){
+  if(on)sessionStorage.setItem('vss_admin','1');else sessionStorage.removeItem('vss_admin');
+  document.body.classList.toggle('is-admin',on);
+  $('#loginBtn').textContent=on?'Админ ✓':'Вход';
+  $('#tok').value=getTok();$('#tokBox').open=!getTok();
+}
+async function syncRemote(){
+  try{const r=await remotePosts();if(r){posts=r;render();toast('Список обновлён из GitHub','ok')}else toast('posts.json ещё не создан — он появится при первой публикации')}
+  catch(e){toast(e.message,'err')}
+}
+function openEditor(id){
+  editingId=id||null;const p=id?posts.find(x=>x.id===id):null;
+  $('#editTitle').textContent=p?'Изменить пост':'Новый пост';
+  $('#fType').value=p?p.type:'news';$('#fTitle').value=p?p.title:'';$('#fText').value=p?p.text:'';
+  const n=new Date(),pad=x=>String(x).padStart(2,'0');
+  $('#fDate').value=p?p.date:`${pad(n.getDate())}.${pad(n.getMonth()+1)}.${n.getFullYear()}`;
+  $('#fImg').value=p?p.img||'':'';$('#fFile').value='';
+  $('#editDlg').showModal();
+}
+
+/* ===== События ===== */
+document.addEventListener('click',e=>{
+  if(e.target.closest('[data-close]')){e.target.closest('dialog').close();return}
+  if(e.target.tagName==='DIALOG'){e.target.close();return}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const id=b.closest('.card').dataset.id;
+  if(b.dataset.act==='read')openRead(id);
+  if(b.dataset.act==='edit')openEditor(id);
+  if(b.dataset.act==='del'){
+    const p=posts.find(x=>x.id===id);
+    if(confirm('Удалить пост «'+(p?p.title:'')+'» для всех посетителей?'))commit(l=>l.filter(x=>x.id!==id),'Удалён пост');
+  }
+});
+$('#loginBtn').onclick=()=>{if(isAdmin()){$('#admin').scrollIntoView({behavior:'smooth'});return}$('#pass').value='';$('#loginDlg').showModal()};
+async function sha256Hex(t){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+$('#loginForm').onsubmit=async e=>{
+  e.preventDefault();
+  if(await sha256Hex($('#pass').value)===ADMIN_PASS_HASH){$('#loginDlg').close();setAdmin(true);toast('Режим администратора','ok')}
+  else{toast('Неверный пароль','err');$('#pass').select()}
+};
+$('#logoutBtn').onclick=()=>{setAdmin(false)};
+$('#newBtn').onclick=()=>openEditor();
+$('#syncBtn').onclick=syncRemote;
+$('#tokSave').onclick=()=>{const v=$('#tok').value.trim();if(!v)return toast('Введите токен','err');try{localStorage.setItem(TOKEN_KEY,v);toast('Токен сохранён на этом устройстве','ok')}catch(e){toast('Не удалось сохранить токен','err')}};
+$('#tokDel').onclick=()=>{try{localStorage.removeItem(TOKEN_KEY)}catch(e){}$('#tok').value='';toast('Токен удалён')};
+$('#tokCheck').onclick=async()=>{
+  try{const r=await fetch(`https://api.github.com/repos/${OWNER}/${REPO}`,{headers:{'Authorization':'Bearer '+(getTok()||$('#tok').value.trim()),'Accept':'application/vnd.github+json'}});
+    if(!r.ok)throw new Error(await errMsg(r));const j=await r.json();
+    toast(j.permissions&&j.permissions.push?'Токен работает, запись разрешена':'Токен видит репозиторий, но без права записи',j.permissions&&j.permissions.push?'ok':'err')}
+  catch(e){toast(e.message,'err')}
+};
+$('#editForm').onsubmit=async e=>{
+  e.preventDefault();
+  const file=$('#fFile').files[0];
+  const rec={type:$('#fType').value,title:$('#fTitle').value.trim(),text:$('#fText').value.trim(),date:$('#fDate').value.trim(),img:$('#fImg').value.trim()};
+  if(!getTok()){toast('Сначала сохраните GitHub-токен','err');return}
+  $('#editDlg').close();
+  try{
+    if(file){
+      toast('Загружаю фото…');
+      const name='img_'+Date.now()+'.jpg';
+      await putFile(name,await compress(file),'Фото для поста');
+      rec.img=name;
+    }
+  }catch(err){toast(err.message||'Не удалось загрузить фото','err');return}
+  const id=editingId;
+  await commit(l=>{
+    if(id){const i=l.findIndex(x=>x.id===id);if(i>=0)l[i]={...l[i],...rec};else l.unshift({id:'p'+Date.now(),...rec})}
+    else l.unshift({id:'p'+Date.now(),...rec});
+    return l;
+  },id?'Изменён пост':'Новый пост');
+};
+
+/* ===== Старт ===== */
+setAdmin(isAdmin());
+render();
+loadPosts();
+</script>
+</body>
+</html>
